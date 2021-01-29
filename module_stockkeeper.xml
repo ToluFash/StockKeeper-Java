@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_stockkeeper" default="compile.module.stockkeeper">
+  <dirname property="module.stockkeeper.basedir" file="${ant.file.module_stockkeeper}"/>
+  
+  <property name="module.jdk.home.stockkeeper" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.stockkeeper" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.stockkeeper" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.stockkeeper" value="-encoding UTF-8 -source 10 -target 10 ${compiler.args}"/>
+  
+  <property name="stockkeeper.output.dir" value="${module.stockkeeper.basedir}/out/production/StockKeeper"/>
+  <property name="stockkeeper.testoutput.dir" value="${module.stockkeeper.basedir}/out/test/StockKeeper"/>
+  
+  <path id="stockkeeper.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="stockkeeper.module.production.classpath">
+    <path refid="${module.jdk.classpath.stockkeeper}"/>
+  </path>
+  
+  <path id="stockkeeper.runtime.production.module.classpath">
+    <pathelement location="${stockkeeper.output.dir}"/>
+  </path>
+  
+  <path id="stockkeeper.module.classpath">
+    <path refid="${module.jdk.classpath.stockkeeper}"/>
+    <pathelement location="${stockkeeper.output.dir}"/>
+  </path>
+  
+  <path id="stockkeeper.runtime.module.classpath">
+    <pathelement location="${stockkeeper.testoutput.dir}"/>
+    <pathelement location="${stockkeeper.output.dir}"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.stockkeeper">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.stockkeeper">
+    <patternset refid="excluded.from.module.stockkeeper"/>
+  </patternset>
+  
+  <path id="stockkeeper.module.sourcepath">
+    <dirset dir="${module.stockkeeper.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.stockkeeper" depends="compile.module.stockkeeper.production,compile.module.stockkeeper.tests" description="Compile module StockKeeper"/>
+  
+  <target name="compile.module.stockkeeper.production" depends="register.custom.compilers" description="Compile module StockKeeper; production classes">
+    <mkdir dir="${stockkeeper.output.dir}"/>
+    <javac2 destdir="${stockkeeper.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.stockkeeper}/javac">
+      <compilerarg line="${compiler.args.stockkeeper}"/>
+      <bootclasspath refid="stockkeeper.module.bootclasspath"/>
+      <classpath refid="stockkeeper.module.production.classpath"/>
+      <src refid="stockkeeper.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.stockkeeper"/>
+    </javac2>
+    
+    <copy todir="${stockkeeper.output.dir}">
+      <fileset dir="${module.stockkeeper.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.stockkeeper.tests" depends="register.custom.compilers,compile.module.stockkeeper.production" description="compile module StockKeeper; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.stockkeeper" description="cleanup module">
+    <delete dir="${stockkeeper.output.dir}"/>
+    <delete dir="${stockkeeper.testoutput.dir}"/>
+  </target>
+</project>
